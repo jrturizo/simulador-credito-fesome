@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Crédito FESOME</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded-3 shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-calculator me-2 text-primary"></i>Simulador de Crédito FESOME 
+                </a>
+                <button id="printButton" title="Imprimir" aria-label="Imprimir">
+                    <i class="fas fa-print me-2 text-primary"></i>
+                </button>
+                  
+            </div>
+        </nav>
+        
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="nav nav-tabs" id="creditTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#simulator" type="button" role="tab" aria-controls="simulator" aria-selected="true">
+                            <i class="fas fa-calculator me-2"></i>Simulador
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="false">
+                            <i class="fas fa-info-circle me-2"></i>Información
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="creditTabsContent">
+                    <div class="tab-pane fade show active" id="simulator" role="tabpanel" aria-labelledby="simulator-tab">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="fas fa-cog me-2"></i>Parámetros del Crédito
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="creditForm">
+                                            <div class="mb-3">
+                                                <label for="creditType" class="form-label">Línea de Crédito</label>
+                                                <select class="form-select shadow-sm" id="creditType" required>
+                                                    <option value="" selected disabled>Seleccione una línea de crédito</option>
+                                                    <option value="libre_inversion">Libre Inversión</option>
+                                                    <option value="especial">Especial</option>
+                                                    <option value="vehiculo">Vehículo</option>
+                                                    <option value="vivienda">Vivienda</option>
+                                                    <option value="educacion">Educación</option>
+                                                    <option value="garantia">Garantía</option>
+                                                    <option value="impuestos">Impuestos al Día</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="aportes" class="form-label">Valor de sus Aportes</label>
+                                                <div class="input-group shadow-sm">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" id="aportes" placeholder="Ingrese el valor de sus aportes" value="0">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="amount" class="form-label">Monto del Crédito</label>
+                                                <div class="input-group shadow-sm">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" id="amount" placeholder="Ingrese el monto deseado" required>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="term" class="form-label">Plazo</label>
+                                                <div class="input-group shadow-sm">
+                                                    <input type="number" class="form-control" id="term" placeholder="Ingrese el plazo" required>
+                                                    <span class="input-group-text">meses</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="frequency" class="form-label">Frecuencia de Pago</label>
+                                                <select class="form-select shadow-sm" id="frequency" required>
+                                                    <option value="mensual">Mensual</option>
+                                                    <option value="quincenal" selected>Quincenal</option>
+                                                    
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="interestRate" class="form-label">Tasa de Interés</label>
+                                                <div class="input-group shadow-sm">
+                                                    <input type="number" class="form-control" id="interestRate" step="0.01" readonly>
+                                                    <span class="input-group-text">% Mensual</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="alertContainer"></div>
+                                            
+                                            
+                                            <div class="d-grid gap-2">
+                                                <button type="submit" class="btn btn-primary" id="calculateBtn">
+                                                    <i class="fas fa-calculator me-2"></i>Calcular Simulación
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7"> 
+                                <div id="contenido-principal">
+                                    <div class="result-container" id="resultContainer">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <i class="fas fa-file-invoice-dollar me-2"></i>Resumen del Crédito
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Monto Solicitado</h6>
+                                                            <h4 id="summaryAmount">$0</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Plazo</h6>
+                                                            <h4 id="summaryTerm">0 meses</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Tasa de Interés</h6>
+                                                            <h4 id="summaryRate">0%</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Valor Cuota</h6>
+                                                            <h4 id="summaryPayment">$0</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Total a Pagar</h6>
+                                                            <h4 id="summaryTotal">$0</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="summary-box">
+                                                            <h6>Total Intereses</h6>
+                                                            <h4 id="summaryInterest">$0</h4>
+                                                        </div>
+                                                    </div>
+                                                    <div id="alertContaine2"></div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card mt-4">
+                                            <div class="card-header">
+                                                <i class="fas fa-table me-2"></i>Tabla de Amortización
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-hover" id="amortizationTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>No. Cuota</th>
+                                                                <th>Valor Cuota</th>
+                                                                <th>Interés</th>
+                                                                <th>Abono a Capital</th>
+                                                                <th>Saldo</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="amortizationBody">
+                                                            <!-- La tabla se llena con JavaScript -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-info-circle me-2"></i>Condiciones Generales y Tarifas
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info mb-4">
+                                    <h5><i class="fas fa-check-circle me-2"></i>Condiciones Generales:</h5>
+                                    <ul>
+                                        <li>Ser asociado activo</li>
+                                        <li>Estar al día en el cumplimiento de obligaciones que haya contraído con FESOME</li>
+                                        <li>Suministrar la información y documentación necesaria para el estudio de la solicitud (deberá aportarse última colilla de pago, solicitud de crédito, autorización, pagaré y carta de instrucciones diligenciados)</li>
+                                        <li>Tener la capacidad de pago que exige cada línea de crédito</li>
+                                    </ul>
+                                    <p class="fw-bold">TODO CRÉDITO ESTARÁ SUJETO A LA CAPACIDAD DE ENDEUDAMIENTO DE CADA ASOCIADO.</p>
+                                </div>
+                                
+                                <div class="accordion" id="accordionCreditTypes">
+                                    <!-- Libre Inversión -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingLibreInversion">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLibreInversion" aria-expanded="true" aria-controls="collapseLibreInversion">
+                                                <i class="fas fa-money-bill-wave me-2"></i>Crédito Libre Inversión
+                                            </button>
+                                        </h2>
+                                        <div id="collapseLibreInversion" class="accordion-collapse collapse show" aria-labelledby="headingLibreInversion" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento: 2 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3">Tasa: 1.49% Mensual</p>
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>De $0 a $3.000.000</td>
+                                                            <td><span class="badge bg-secondary">24 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $3.000.001 a $5.000.000</td>
+                                                            <td><span class="badge bg-secondary">36 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $5.000.001 a $7.000.000</td>
+                                                            <td><span class="badge bg-secondary">48 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $7.000.001 en adelante</td>
+                                                            <td><span class="badge bg-secondary">60 meses</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Especial -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingEspecial">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEspecial" aria-expanded="false" aria-controls="collapseEspecial">
+                                                <i class="fas fa-star me-2"></i>Crédito Especial
+                                            </button>
+                                        </h2>
+                                        <div id="collapseEspecial" class="accordion-collapse collapse" aria-labelledby="headingEspecial" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento: 2.5 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3">Tasa: 1.69% Mensual</p>
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>De $0 a $4.500.000</td>
+                                                            <td><span class="badge bg-secondary">24 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $4.500.001 a $6.750.000</td>
+                                                            <td><span class="badge bg-secondary">36 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $6.750.001 a $9.000.000</td>
+                                                            <td><span class="badge bg-secondary">48 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $9.000.001 a $12.000.000</td>
+                                                            <td><span class="badge bg-secondary">60 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $12.000.001 en adelante</td>
+                                                            <td><span class="badge bg-secondary">72 meses</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Vehículo -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingVehiculo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVehiculo" aria-expanded="false" aria-controls="collapseVehiculo">
+                                                <i class="fas fa-car me-2"></i>Crédito Vehículo
+                                            </button>
+                                        </h2>
+                                        <div id="collapseVehiculo" class="accordion-collapse collapse" aria-labelledby="headingVehiculo" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento: 2.5 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3">Tasa: 1.29% Mensual</p>
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>De $0 a $4.500.000</td>
+                                                            <td><span class="badge bg-secondary">24 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $4.500.001 a $6.750.000</td>
+                                                            <td><span class="badge bg-secondary">36 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $6.750.001 a $9.000.000</td>
+                                                            <td><span class="badge bg-secondary">48 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $9.000.001 a $12.000.000</td>
+                                                            <td><span class="badge bg-secondary">60 meses</span></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $12.000.001 en adelante</td>
+                                                            <td><span class="badge bg-secondary">72 meses</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table> 
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Vivienda -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingVivienda">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVivienda" aria-expanded="false" aria-controls="collapseVivienda">
+                                                <i class="fas fa-house me-2"></i>Crédito Vivienda
+                                            </button>
+                                        </h2>
+                                        <div id="collapseVivienda" class="accordion-collapse collapse" aria-labelledby="headingVivienda" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento: 2.5 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3"> 0.99% Mensual</p>
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>De $0 a $6.000.000</td>
+                                                            <td>24 meses</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $6.000.001 a $9.000.000</td>
+                                                            <td>36 meses</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $9.000.001 a $12.000.000</td>
+                                                            <td>48 meses</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>De $12.000.001 en adelante</td>
+                                                            <td>72 meses</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Educación -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingEducacion">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEducacion" aria-expanded="false" aria-controls="collapseEducacion">
+                                                <i class="fas fa-graduation-cap me-2"></i>Crédito Educación
+                                            </button>
+                                        </h2>
+                                        <div id="collapseEducacion" class="accordion-collapse collapse" aria-labelledby="headingEducacion" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento:</strong> 2.5 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3">Tasa: 0.99% Mensual</p>
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>De $0 a $10.000.000</td>
+                                                            <td>6 meses</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Garantía -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingGarantia">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGarantia" aria-expanded="false" aria-controls="collapseGarantia">
+                                                <i class="fas fa-car me-2"></i>Crédito Garantía
+                                            </button>
+                                        </h2>
+                                        <div id="collapseGarantia" class="accordion-collapse collapse" aria-labelledby="headingGarantia" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">Capacidad de endeudamiento: 2.5 VECES VALOR DE LOS APORTES</p>
+                                                <p class="badge bg-success mb-3"> 1.8% Mensual</p>
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Montos</th>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>80% del salario a $10.000.000</td>
+                                                            <td>6 meses</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Impuestos al Día -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingImpuestos">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImpuestos" aria-expanded="false" aria-controls="collapseImpuestos">
+                                                <i class="fas fa-building-columns me-2"></i>Crédito Impuestos al Día
+                                            </button>
+                                        </h2>
+                                        <div id="collapseImpuestos" class="accordion-collapse collapse" aria-labelledby="headingImpuestos" data-bs-parent="#accordionCreditTypes">
+                                            <div class="accordion-body">
+                                                <p class="badge bg-primary mb-2">De acuerdo con el valor de las facturas y la capacidad de endeudamiento del asociado (facturas impuestos de vehículo, vivienda y/o cotización de SOAT)</p>
+                                                <p class="badge bg-success mb-3">Tasa: 1.1% Mensual</p>
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Plazo Máximo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>12 meses</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-4 text-center text-muted">
+            <p>© 2025 FESOME - Simulador de Crédito</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./script.js"></script>
+</body>
+</html>
